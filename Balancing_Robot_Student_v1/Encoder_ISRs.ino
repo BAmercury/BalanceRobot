@@ -1,6 +1,6 @@
 void State_A()
 {
-  if (digitalRead(18))
+  if (digitalRead(PIN_M1_ENCB))
   {
     Sum_Right ++;
   }
@@ -12,7 +12,7 @@ void State_A()
 
 void State_B()
 {
-  if (!digitalRead(2))
+  if (!digitalRead(PIN_M2_ENCB))
   {
     Sum_Left ++;
   }

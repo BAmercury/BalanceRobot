@@ -66,12 +66,18 @@ const double velEstT_us = 25000; // how long a period to use for computing the a
 //_____________________________________________________________________________________________________
 
 
-int TN1 = 23;
-int TN2 = 22;
-int ENA = 5;
-int TN3 = 24;
-int TN4 = 25;
-int ENB = 4;
+// Motor H-Bridge Control Pins
+int PIN_M1_IN1 = 4; // Timer 1 PWM Pins
+int PIN_M1_IN2 = 12; // Timer 1 PWM Pins
+int PIN_M2_IN1B = 5; // Timer 3 PWM Pins
+int PIN_M2_IN2B = 7; // Timer 3 PWM Pins
+
+// Motor Encoder Pins
+// Arduino MEGA External Interruptable Pins
+int PIN_M1_ENCA = 2;
+int PIN_M1_ENCB = 3;
+int PIN_M2_ENCA = 18;
+int PIN_M2_ENCB = 19;
 
 // Flags
 boolean ratePinState = HIGH, firstLoop = true;
@@ -96,18 +102,17 @@ void setup()
   }
 
   // Setup pins used for PWM output and H-bridge control
-  pinMode(TN1, OUTPUT);
-  pinMode(TN2, OUTPUT);
-  pinMode(TN3, OUTPUT);
-  pinMode(TN4, OUTPUT);
-  pinMode(ENA, OUTPUT);
-  pinMode(ENB, OUTPUT);
-  pinMode(18, INPUT);
-  pinMode(2, INPUT);
-
+  pinMode(PIN_M1_ENCA, INPUT);
+  pinMode(PIN_M1_ENCB, INPUT);
+  pinMode(PIN_M1_IN1, OUTPUT);
+  pinMode(PIN_M1_IN2, OUTPUT);
+  pinMode(PIN_M2_ENCA, INPUT);
+  pinMode(PIN_M2_ENCB, INPUT);
+  pinMode(PIN_M2_IN1B, OUTPUT);
+  pinMode(PIN_M2_IN2B, OUTPUT);
   // Setup interrupts used to capture encoder signals
-  attachInterrupt(4, State_A, FALLING);
-  attachInterrupt(1, State_B, FALLING);
+  attachInterrupt(PIN_M1_ENCA, State_A, FALLING);
+  attachInterrupt(PIN_M2_ENCA, State_B, FALLING);
 
   Timer1.initialize(velEstT_us); // initialize ISR timer based on this period
   Timer1.attachInterrupt(VelocityEstimate); // attach named ISR to timer
@@ -123,10 +128,8 @@ void loop() {
   }
   else // If tilt is not within limits, shutoff the motors and zero the motor position
   {
-    digitalWrite(TN1, HIGH);
-    digitalWrite(TN2, HIGH); // Stops the left motor
-    digitalWrite(TN3, HIGH);
-    digitalWrite(TN4, HIGH); // Stops the right motor
+    // Stops left and right motor
+    active_motor_brake(PIN_M1_IN1, PIN_M1_IN2, PIN_M2_IN1B, PIN_M2_IN2B);
     // Reset motor position to zero (Alpha)
     Sum_Right = 0; Sum_Left = 0;
     Alpha = 0; AlphaLast = 0;

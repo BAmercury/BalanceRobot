@@ -1,0 +1,7 @@
+{
+    "programmer": "AVR ISP",
+    "board": "arduino:avr:mega",
+    "port": "COM26",
+    "sketch": "Balancing_Robot_Student_v1/Balancing_Robot_Student_v1.ino",
+    "configuration": "cpu=atmega2560"
+}
