@@ -1,18 +1,27 @@
 #include <Encoder.h>
-#include <TimerOne.h>
-#define IN1 4
-#define IN2 12
+//#include <TimerOne.h>
+#define IN1 4 // OC0B
+#define IN2 12 
 #define POT 0
 
 #define DIR_PIN 2
-#define IN1B 5
+#define IN1B 5 // OC3A
 #define IN2B 7
 
 volatile bool dir_lock = false;
 
-Encoder enc1(2,3);
-Encoder enc2(18,19);
+//Encoder enc1(2,3);
+//Encoder enc2(18,19);
+/*
 
+Motor 1: 
+  - IN1 = Pin 4, Timer 0 OCR3A
+  - IN2 = Pin 12
+Motor 2: 
+  - IN1B = Pin 5, Timer 3 OCR0B
+  - IN2B = Pin 7
+
+*/
 
 void lock_direction()
 {
@@ -58,8 +67,10 @@ void motor_drive(int dir, int pwm)
       According to truth table of datasheet, if IN2/2B is HIGH,
       IN1/1B must be LOW for VS->OUT1, OUT2->GND
     */
-    analogWrite(IN1, -pwm);
-    analogWrite(IN1B, -pwm);
+    OCR3A = -1023;
+    OCR0B = -pwm;
+    //analogWrite(IN1, -pwm);
+    //analogWrite(IN1B, -pwm);
   }
   else
   {
@@ -74,8 +85,10 @@ void motor_drive(int dir, int pwm)
       According to truth table of datasheet, if IN2/2B is LOW,
       IN1/1B must be HIGH for VS->OUT2, OUT1->GND
     */
-    analogWrite(IN1, pwm);
-    analogWrite(IN1B, pwm);
+    OCR3A = 1023;
+    OCR0B = pwm;
+    //analogWrite(IN1, pwm);
+    //analogWrite(IN1B, pwm);
   }
 
 
@@ -92,6 +105,11 @@ void setup()
     pinMode(IN1B, OUTPUT);
     pinMode(POT, INPUT);
     Serial.begin(115200);
+    // Setup timers used for PWM
+    TCCR3A = _BV(COM3A1) | _BV(WGM31) | _BV(WGM30); // TIMER_3 @1K Hz, fast pwm
+    TCCR3B = _BV(CS31);
+    TCCR0A = _BV(COM0B1) | _BV(WGM01) | _BV(WGM00); // TIMER_0 @1K Hz, fast pwm
+    TCCR0B = _BV(CS01) | _BV(CS00); 
     //Timer1.initialize(2500);
     //Timer1.attachInterrupt(VelocityEstimate);
     //attachInterrupt(digitalPinToInterrupt(DIR_PIN), lock_direction, HIGH);
@@ -103,19 +121,19 @@ void loop() {
   int pwm = 255;
   motor_drive(dir_lock, pwm);
 
-  delay(100);
-
-  coast_motor_brake();
-
   delay(1000);
+
+  //coast_motor_brake();
+
+  //delay(1000);
 
   motor_drive(!dir_lock, pwm);
 
-  delay(100);
-
-  coast_motor_brake();
-
   delay(1000);
+
+  //coast_motor_brake();
+
+  //delay(1000);
   
  
 
