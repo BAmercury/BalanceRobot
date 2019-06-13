@@ -3,16 +3,6 @@
  on the L6205 DMOS Dual Full Bridge Driver
 */
 
-/*
-
-Motor 1: 
-  - IN1 = Pin 4, Timer 0 OCR3A
-  - IN2 = Pin 12
-Motor 2: 
-  - IN1B = Pin 5, Timer 3 OCR0B
-  - IN2B = Pin 7
-
-*/
 
 
 void coast_motor_brake(int M1_IN1, int M1_IN2, int M2_IN1, int M2_IN2)
@@ -60,29 +50,31 @@ void m2_drive_reg(int dir, int pwm)
 {
   if (dir)
   {
-    OCR0B = -pwm;
+    //OCR1C = -pwm;
+    analogWrite(13, -pwm);
   }
   else
   {
-    OCR0B = pwm;
+    analogWrite(13, pwm);
+    //OCR1C = pwm;
   }
   
 }
 
-void motor_drive_reg(int dir, int pwm)
+void motor_drive_single(int pwm, boolean dir, int pin)
 {
   if (dir)
   {
-    OCR3A = -pwm;
-    OCR0B = -pwm;
+    analogWrite(pin, -pwm);
   }
   else
   {
-    OCR3A = pwm;
-    OCR0B = pwm;
+    analogWrite(pin, pwm);
   }
 
 }
+
+
 
 void motor_drive_single_dir(boolean dir, int M_IN2)
 {

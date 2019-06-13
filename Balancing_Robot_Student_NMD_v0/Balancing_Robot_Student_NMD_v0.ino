@@ -67,23 +67,54 @@ const double velEstT_us = 25000; // how long a period to use for computing the a
 
 
 // Motor H-Bridge Control Pins
-int PIN_M1_IN1 = 4; // Timer 3 PWM Pins
-int PIN_M1_IN2 = 12; // Timer 0 PWM Pins
-int PIN_M2_IN1B = 5; // Timer 0 PWM Pins
-int PIN_M2_IN2B = 7; // Timer 3 PWM Pins
+int PIN_M1_IN1A = 5; // Timer 3 PWM Motor 1
+int PIN_M1_IN2A = 4; // Motor 1 Direction
+int PIN_M2_IN1B = 13; // Timer 0 PWM Motor 2
+int PIN_M2_IN2B = A1;  // Motor 2 Direction
 
 // Motor Encoder Pins
 // Arduino MEGA External Interruptable Pins
-int PIN_M1_ENCA = 2;
+int PIN_M1_ENCA = 18;
 int PIN_M1_ENCB = 3;
-int PIN_M2_ENCA = 18;
-int PIN_M2_ENCB = 19;
+int PIN_M2_ENCA = 19;
+int PIN_M2_ENCB = 6;
+
+// Motor Controller Sense and Enable Pins
+int PIN_M1_ENA = 2;
+int PIN_M2_ENA = A4;
+int PIN_M1_SENSEA = 12;
+int PIN_M2_SENSEB = A2;
+
+// High impedance analog input pins
+//int PIN_A0 = A0;
+//int PIN_A1 = A1;
 
 // Flags
 boolean ratePinState = HIGH, firstLoop = true;
 
 void setup()
 {
+  // Setup motor controller sense and enable
+  pinMode(PIN_M1_ENA, OUTPUT);
+  pinMode(PIN_M2_ENA, OUTPUT);
+  //pinMode(PIN_A0, OUTPUT);
+  //pinMode(PIN_A1, OUTPUT);
+  pinMode(A0, INPUT);
+  pinMode(PIN_M1_SENSEA, OUTPUT);
+  pinMode(PIN_M2_SENSEB, OUTPUT);
+
+
+
+  digitalWrite(PIN_M1_ENA, HIGH);
+  digitalWrite(PIN_M2_ENA, HIGH);
+  digitalWrite(PIN_M1_SENSEA, LOW);
+  digitalWrite(PIN_M2_SENSEB, LOW);
+  //digitalWrite(A0, HIGH);
+  //digitalWrite(PIN_A1, HIGH);
+
+
+
+
   Serial.begin(115200);
   Wire.begin();
 
@@ -104,10 +135,16 @@ void setup()
   // Setup pins used for PWM output and H-bridge control
   pinMode(PIN_M1_ENCA, INPUT);
   pinMode(PIN_M1_ENCB, INPUT);
-  pinMode(PIN_M1_IN1, OUTPUT);
-  pinMode(PIN_M1_IN2, OUTPUT);
+
+
+  pinMode(PIN_M1_IN1A, OUTPUT);
+  pinMode(PIN_M1_IN2A, OUTPUT);
+
+
   pinMode(PIN_M2_ENCA, INPUT);
   pinMode(PIN_M2_ENCB, INPUT);
+
+
   pinMode(PIN_M2_IN1B, OUTPUT);
   pinMode(PIN_M2_IN2B, OUTPUT);
   // Setup interrupts used to capture encoder signals
@@ -126,7 +163,7 @@ void loop() {
   State_Estimator_Wheels_Only();
   //stepCmd(double stepTime, double stepDuration, double startThrottle, double stepThrottle, double endThrottle)
   // -100 and 100 are the throttle boundaries
-  stepCmd(5, 5, -100, 100, 0);
+  stepCmd(100, 100, -75, 75, 0);
   PWMControl(); // Apply motor command to motor via PWM outputs
   printData_Wheel_Only(); // execute the print command
 }

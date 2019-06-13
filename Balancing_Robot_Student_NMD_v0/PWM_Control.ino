@@ -1,40 +1,26 @@
-
-/*
-
-Motor 1: 
-  - IN1 = Pin 4, Timer 0 OCR3A
-  - IN2 = Pin 12
-Motor 2: 
-  - IN1B = Pin 5, Timer 3 OCR0B
-  - IN2B = Pin 7
-
-*/
-
-
-
 void PWMControl()
 {
 
   // Saturation
   int m1_pwm = min(1023, (abs(10.23*LThrottle))); // Timer 3 Pin 4 OCR3A
-  int m2_pwm = min(255, (abs(2.55*RThrottle))); // Timer 0 Pin 5 OCR0B
+  int m2_pwm = min(255, (abs(2.55*RThrottle))); // Timer 0 Pin 13 OCR0A/OCR1C
   static boolean m1_dir = false;
   static boolean m2_dir = false;
   if (LThrottle > 0)
   {
     m1_dir = true;
-    motor_drive_single_dir(m1_dir,PIN_M1_IN2);
+    motor_drive_single_dir(m1_dir,PIN_M1_IN2A);
   }
   else if (LThrottle < 0)
   {
     m1_dir = false;
-    motor_drive_single_dir(m1_dir,PIN_M1_IN2);
+    motor_drive_single_dir(m1_dir,PIN_M1_IN2A);
   }
   else
   {
     m1_pwm = 0;
     m1_dir = false;
-    motor_drive_single_dir(m1_dir,PIN_M1_IN2);
+    motor_drive_single_dir(m1_dir,PIN_M1_IN2A);
   }
 
   
@@ -61,6 +47,8 @@ void PWMControl()
   }
   m1_drive_reg(m1_dir, m1_pwm);
   m2_drive_reg(m2_dir, m2_pwm);
+  //m1_drive_reg(m1_dir, m1_pwm);
+  //m2_drive_reg(m2_dir, m2_pwm);
   //Serial.println("M1 PWM: " + String(m1_pwm));
   //Serial.println("M2 PWM: " + String(m2_pwm));
   //OCR3A = min(1023, (abs(10.23*LThrottle))); // Timer/Counter3 is a general purpose 16-bit Timer/Counter module
